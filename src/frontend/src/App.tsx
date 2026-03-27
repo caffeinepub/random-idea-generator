@@ -57,9 +57,22 @@ const CATEGORY_ICONS: Record<string, string> = {
   Space: "🚀",
 };
 
-const TONE_COLORS = {
+const TONE_LABELS: Record<string, string> = {
+  serious: "🎯 Serious",
+  silly: "🤪 Silly",
+  creative: "🌈 Creative",
+  dark: "😈 Dark",
+  inspirational: "💡 Inspirational",
+  weird: "🤯 Weird",
+};
+
+const TONE_COLORS: Record<string, string> = {
   serious: "bg-primary/20 text-primary border-primary/30",
   silly: "bg-accent/20 text-accent border-accent/30",
+  creative: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
+  dark: "bg-rose-500/20 text-rose-400 border-rose-500/30",
+  inspirational: "bg-amber-500/20 text-amber-400 border-amber-500/30",
+  weird: "bg-violet-500/20 text-violet-400 border-violet-500/30",
 };
 
 const SKELETON_KEYS = ["a", "b", "c", "d", "e", "f", "g"];
@@ -128,7 +141,7 @@ export default function App() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([
     "Random",
   ]);
-  const [tone, setTone] = useState<"serious" | "silly">("serious");
+  const [tone, setTone] = useState<string>("serious");
   const [currentIdea, setCurrentIdea] = useState<Idea | null>(null);
   const [ideaKey, setIdeaKey] = useState(0);
   const [favorites, setFavorites] = useState<Idea[]>(loadFavorites);
@@ -356,39 +369,65 @@ export default function App() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25, duration: 0.5 }}
-            className="mb-8 flex justify-center"
+            className="mb-8"
             aria-label="Tone selection"
           >
-            <div className="flex gap-1 p-1 rounded-full bg-secondary/60 border border-border">
-              <button
-                type="button"
-                data-ocid="tone.serious.toggle"
-                onClick={() => setTone("serious")}
-                className={[
-                  "px-5 py-2 rounded-full text-sm font-body font-600 transition-all duration-200",
-                  tone === "serious"
-                    ? "bg-primary/30 text-primary shadow-sm"
-                    : "text-muted-foreground hover:text-foreground",
-                ].join(" ")}
-                aria-pressed={tone === "serious"}
-              >
-                🎯 Serious
-              </button>
-              <button
-                type="button"
-                data-ocid="tone.silly.toggle"
-                onClick={() => setTone("silly")}
-                className={[
-                  "px-5 py-2 rounded-full text-sm font-body font-600 transition-all duration-200",
-                  tone === "silly"
-                    ? "bg-accent/30 text-accent shadow-sm"
-                    : "text-muted-foreground hover:text-foreground",
-                ].join(" ")}
-                aria-pressed={tone === "silly"}
-              >
-                🤪 Silly
-              </button>
-            </div>
+            <p className="text-muted-foreground text-xs font-body uppercase tracking-widest mb-3 text-center">
+              Choose a tone
+            </p>
+            <fieldset className="flex flex-wrap gap-2 justify-center border-0 p-0 m-0">
+              <legend className="sr-only">Tone selection</legend>
+              {(
+                [
+                  {
+                    key: "serious",
+                    activeClass:
+                      "bg-primary/30 text-primary border-primary/50 scale-105",
+                  },
+                  {
+                    key: "silly",
+                    activeClass:
+                      "bg-accent/30 text-accent border-accent/50 scale-105",
+                  },
+                  {
+                    key: "creative",
+                    activeClass:
+                      "bg-emerald-500/30 text-emerald-400 border-emerald-500/50 scale-105",
+                  },
+                  {
+                    key: "dark",
+                    activeClass:
+                      "bg-rose-500/30 text-rose-400 border-rose-500/50 scale-105",
+                  },
+                  {
+                    key: "inspirational",
+                    activeClass:
+                      "bg-amber-500/30 text-amber-400 border-amber-500/50 scale-105",
+                  },
+                  {
+                    key: "weird",
+                    activeClass:
+                      "bg-violet-500/30 text-violet-400 border-violet-500/50 scale-105",
+                  },
+                ] as { key: string; activeClass: string }[]
+              ).map(({ key, activeClass }) => (
+                <button
+                  type="button"
+                  key={key}
+                  data-ocid={`tone.${key}.toggle`}
+                  onClick={() => setTone(key)}
+                  className={[
+                    "inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-body font-600 transition-all duration-200 border",
+                    tone === key
+                      ? activeClass
+                      : "bg-secondary/50 text-muted-foreground border-border hover:border-primary/30 hover:text-foreground hover:bg-secondary",
+                  ].join(" ")}
+                  aria-pressed={tone === key}
+                >
+                  {TONE_LABELS[key]}
+                </button>
+              ))}
+            </fieldset>
           </motion.section>
 
           {/* Idea Card */}
@@ -440,10 +479,10 @@ export default function App() {
                       <div className="flex items-start gap-3 flex-wrap">
                         <Badge
                           variant="outline"
-                          className={`text-xs font-body border ${tone === "serious" ? TONE_COLORS.serious : TONE_COLORS.silly}`}
+                          className={`text-xs font-body border ${TONE_COLORS[tone] ?? TONE_COLORS.serious}`}
                           data-ocid="idea.card"
                         >
-                          {tone === "serious" ? "🎯 Serious" : "🤪 Silly"}
+                          {TONE_LABELS[tone] ?? tone}
                         </Badge>
                         <Badge
                           variant="outline"
